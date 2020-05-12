@@ -2,9 +2,21 @@
 [ORG 0x7C00]					;Location to load OS into memory
 
 start:
+;Initial Text
 	MOV 	SI, boot_load_str	;Place Bootloader pointer in SI
 	CALL    PrintString			;Call Procedure for printing strings
-	JMP     $					
+	
+;Mouse control	
+	MOV		AH, 0x01			;creates box cursor
+	MOV		CX, 0x07
+	INT		0x10
+	
+	MOV		BL, 0x00			;origin point 0,0
+	MOV		CL, 0x00
+	CALL	Mouse
+
+
+
 
 ;Print Single Character Procedure
 PrintCharacter:			
@@ -27,6 +39,43 @@ next_character:
 	CALL	next_character
 	exit_function:
 	RET
+	
+;Procedure for mnipulating the cursor within the OS
+;Preconditions: BL and CL are set to 0 for origin point	
+Mouse:
+	MOV		AH, 0x02			;Place cursor at origin point
+	MOV		DL, BL
+	MOV		DH, CL
+	INT		0x10
+	
+	MOV		AH, 0x00			;Create Keypress
+	INT		0x16
+	
+	CMP		AL, 0x73			;Go up via a "W"
+	JE		Up
+	CMP		AL, 0x77			;Go Down via a "S"
+	JE		Down
+	CMP		AL, 0x61			;Go Left via a "A"
+	JE		Left
+	CMP		AL, 0x64			;Go Right via a "D"
+	JE		Right
+	JMP		Mouse
+	
+Up:
+	ADD		CL, 0x01
+	JMP		Mouse
+	
+Down:
+	SUB		CL, 0x01
+	JMP		Mouse
+	
+Left:
+	SUB		BL, 0x01
+	JMP		Mouse
+	
+Right:
+	ADD		BL, 0x01
+	JMP		Mouse
 	
 ;Data
 boot_load_str	db	'Matts first OS', 0
