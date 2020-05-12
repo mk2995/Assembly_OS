@@ -1,3 +1,9 @@
+;Main ASM Bootloader file containing the Assembly code necessary
+;to generate a simple 16 Operating System when compiled
+;as an IMG file (Floppy).
+
+;Author: Matthew Klein
+ 
 [BITS 16]						;16-Bit Application
 [ORG 0x7C00]					;Location to load OS into memory
 
@@ -60,19 +66,22 @@ Mouse:
 	CMP		AL, 0x64			;Go Right via a "D"
 	JE		Right
 	JMP		Mouse
-	
+
+;Procedure to place cursor one level Up 	
 Up:
 	ADD		CL, 0x01
 	JMP		Mouse
-	
+
+;Procedure to place cursor one level Down	
 Down:
 	SUB		CL, 0x01
 	JMP		Mouse
-	
+;Procedure to place cursor one level Left	
 Left:
 	SUB		BL, 0x01
 	JMP		Mouse
-	
+
+;Procedure to place cursor one level Right	
 Right:
 	ADD		BL, 0x01
 	JMP		Mouse
